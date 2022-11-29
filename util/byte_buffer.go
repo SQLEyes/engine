@@ -15,7 +15,7 @@ func NewByteBuffer(data []byte) *ByteBuffer {
 	return &ByteBuffer{data: data, pos: 0, len: int64(len(data))}
 }
 func (s *ByteBuffer) HasNext() bool {
-	return s.pos < s.len
+	return s.pos < s.len-1
 }
 
 func (s *ByteBuffer) ReadShort() byte {
@@ -36,7 +36,11 @@ func (s *ByteBuffer) ReadInt16() []byte {
 	s.pos += 2
 	return bs
 }
-
+func (s *ByteBuffer) ReadEnd() []byte {
+	bs := s.data[s.pos:]
+	s.pos = s.len - 1
+	return bs
+}
 func (s *ByteBuffer) Read(len int64) []byte {
 	s.Check(len)
 	bs := s.data[s.pos : s.pos+len]
@@ -59,4 +63,13 @@ func (s *ByteBuffer) Check(len int64) {
 	if (s.pos + len) > s.len {
 		panic("index of array")
 	}
+}
+func (s *ByteBuffer) Position(pos ...int64) int64 {
+	if len(pos) > 0 {
+		s.pos = s.pos + pos[0]
+	}
+	return s.pos
+}
+func (s *ByteBuffer) Len() int64 {
+	return s.len
 }

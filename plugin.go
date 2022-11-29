@@ -21,6 +21,7 @@ type Plugin struct {
 	status    abstract.Msg
 	BPFFilter string
 	Device    string
+	DEBUG     bool
 }
 
 func (p *Plugin) setConfig(config any) {
@@ -37,11 +38,20 @@ func (p *Plugin) setConfig(config any) {
 			}
 			field.Set(reflect.ValueOf(value))
 		}
+		if key == "DEBUG" {
+			p.DEBUG = true
+		}
 	}
 }
 
 func (p *Plugin) startCap() {
-	handle, err := pcap.OpenLive(p.Device, 65535, false, pcap.BlockForever)
+	var handle *pcap.Handle
+	var err error
+	if p.DEBUG {
+		handle, err = pcap.OpenOffline(p.Device)
+	} else {
+		handle, err = pcap.OpenLive(p.Device, 65535, false, pcap.BlockForever)
+	}
 	if err != nil {
 		p.status.Code = 501
 		p.status.Text = err.Error()
@@ -77,8 +87,9 @@ func InstallPlugin(ptr abstract.Plugin) *Plugin {
 	t := reflect.TypeOf(ptr).Elem()
 	name := strings.TrimSuffix(t.Name(), "Config")
 	plugin := &Plugin{
-		Name: name,
-		ptr:  ptr,
+		Name:  name,
+		ptr:   ptr,
+		DEBUG: false,
 	}
 	//v := reflect.ValueOf(ptr).Elem()
 	//bpf := v.FieldByName("BPFFilter")

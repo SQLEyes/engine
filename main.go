@@ -20,6 +20,11 @@ var (
 	ConfigRaw []byte
 )
 
+func init() {
+	fmt.Println(banner.Inline("sqleyes"))
+	fmt.Println("version 1.0")
+	fmt.Println()
+}
 func Run(configFile string) (err error) {
 	if ConfigRaw, err = os.ReadFile(configFile); err != nil {
 		log.Error("read config file error:", err.Error())
@@ -34,7 +39,7 @@ func Run(configFile string) (err error) {
 	}
 	c := make(chan os.Signal)
 	signal.Notify(c)
-	fmt.Println(banner.Inline("sqleyes"))
+
 	log.Infof("sqleyes@1.0 %s", " start success")
 	for _, plugin := range Plugins {
 		//配置文件注入到每个插件
