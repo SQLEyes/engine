@@ -1,9 +1,9 @@
 package engine
 
 import (
-	"engine/abstract"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"github.com/sqleyes/engine/abstract"
 )
 
 func (p *Plugin) Intact(packet gopacket.Packet) {
