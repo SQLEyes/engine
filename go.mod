@@ -1,4 +1,4 @@
-module engine
+module github.com/sqleyes/engine
 
 go 1.19
 

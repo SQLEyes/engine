@@ -1,12 +1,12 @@
 package engine
 
 import (
-	"engine/abstract"
-	"engine/pluginlog"
 	"fmt"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
+	"github.com/sqleyes/engine/abstract"
+	"github.com/sqleyes/engine/pluginlog"
 	"reflect"
 	"runtime"
 	"strings"

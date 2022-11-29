@@ -1,9 +1,9 @@
 package engine
 
 import (
-	"engine/abstract"
-	"engine/pluginlog"
 	"fmt"
+	"github.com/sqleyes/engine/abstract"
+	"github.com/sqleyes/engine/pluginlog"
 	"gopkg.in/yaml.v3"
 	"moul.io/banner"
 	"os"
