@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"engine/config"
+	"engine/abstract"
 	"engine/pluginlog"
 	"fmt"
 	"github.com/google/gopacket"
@@ -16,11 +16,28 @@ type Plugin struct {
 	*pluginlog.PluginLog
 	Name      string
 	Version   string
-	ptr       config.Plugin
+	ptr       abstract.Plugin
 	handle    *pcap.Handle
-	status    config.Msg
+	status    abstract.Msg
 	BPFFilter string
 	Device    string
+}
+
+func (p *Plugin) setConfig(config any) {
+	v := config.(abstract.Config)
+	s := reflect.ValueOf(p.ptr)
+	for key, value := range v {
+		field := s.Elem().FieldByName(key)
+		if field.IsValid() {
+			if key == "BPFFilter" {
+				p.BPFFilter = fmt.Sprintf("%s", value)
+			}
+			if key == "Device" {
+				p.Device = fmt.Sprintf("%s", value)
+			}
+			field.Set(reflect.ValueOf(value))
+		}
+	}
 }
 
 func (p *Plugin) startCap() {
@@ -28,7 +45,7 @@ func (p *Plugin) startCap() {
 	if err != nil {
 		p.status.Code = 501
 		p.status.Text = err.Error()
-		p.ptr.React(config.ERROR(p.status))
+		p.ptr.React(abstract.ERROR(p.status))
 		return
 	}
 	defer handle.Close()
@@ -36,7 +53,7 @@ func (p *Plugin) startCap() {
 	if err != nil {
 		p.status.Code = 501
 		p.status.Text = fmt.Sprintf("can't parse filter expression on [BPFFilter:%s]", p.BPFFilter)
-		p.ptr.React(config.ERROR(p.status))
+		p.ptr.React(abstract.ERROR(p.status))
 		return
 	}
 	sources := gopacket.NewPacketSource(handle, handle.LinkType())
@@ -56,42 +73,32 @@ func (p *Plugin) startCap() {
 	}
 }
 
-func InstallPlugin(ptr config.Plugin) *Plugin {
+func InstallPlugin(ptr abstract.Plugin) *Plugin {
 	t := reflect.TypeOf(ptr).Elem()
 	name := strings.TrimSuffix(t.Name(), "Config")
 	plugin := &Plugin{
 		Name: name,
 		ptr:  ptr,
 	}
-	v := reflect.ValueOf(ptr).Elem()
-	bpf := v.FieldByName("BPFFilter")
-	device := v.FieldByName("Device")
+	//v := reflect.ValueOf(ptr).Elem()
+	//bpf := v.FieldByName("BPFFilter")
+	//device := v.FieldByName("Device")
+	//读取版本信息
 	_, pluginFilePath, _, _ := runtime.Caller(1)
 	plugin.Version = pluginFilePath
 	plugin.PluginLog = pluginlog.NewPluginLog(name)
 	log.Infof("plugin %s:%s installed", plugin.Name, plugin.Version)
 	Plugins[name] = plugin
-	plugin.status = CheckParameter(bpf, "BPFFilter")
-	if plugin.status.Code != 200 {
-		return plugin
-	}
-	plugin.BPFFilter = bpf.String()
-	plugin.status = CheckParameter(device, "Device")
-	if plugin.status.Code == 200 {
-		plugin.Device = device.String()
-	}
+	plugin.status.Code = 200
+	plugin.status.Text = "install success"
+	//plugin.status = CheckParameter(bpf, "BPFFilter")
+	//if plugin.status.Code != 200 {
+	//	return plugin
+	//}
+	//plugin.BPFFilter = bpf.String()
+	//plugin.status = CheckParameter(device, "Device")
+	//if plugin.status.Code == 200 {
+	//	plugin.Device = device.String()
+	//}
 	return plugin
-}
-func CheckParameter(v reflect.Value, field string) config.Msg {
-	if !v.IsValid() || len(v.String()) == 0 {
-		return config.Msg{
-			Code: 500,
-			Text: "install failure caused by: " + field + " IS NULL",
-		}
-	} else {
-		return config.Msg{
-			Code: 200,
-			Text: "install success",
-		}
-	}
 }

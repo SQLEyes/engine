@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"engine/config"
+	"engine/abstract"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 )
@@ -10,7 +10,7 @@ func (p *Plugin) Intact(packet gopacket.Packet) {
 	p.ptr.React(packet)
 }
 func (p *Plugin) Broken(packet gopacket.Packet) {
-	broken := config.Broken{}
+	broken := abstract.Broken{}
 	ipLayer := packet.Layer(layers.LayerTypeIPv4)
 	if ipLayer != nil {
 		ip, _ := ipLayer.(*layers.IPv4)
