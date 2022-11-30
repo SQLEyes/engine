@@ -91,9 +91,6 @@ func InstallPlugin(ptr abstract.Plugin) *Plugin {
 		ptr:   ptr,
 		DEBUG: false,
 	}
-	//v := reflect.ValueOf(ptr).Elem()
-	//bpf := v.FieldByName("BPFFilter")
-	//device := v.FieldByName("Device")
 	//读取版本信息
 	_, pluginFilePath, _, _ := runtime.Caller(1)
 	plugin.Version = pluginFilePath
@@ -102,14 +99,5 @@ func InstallPlugin(ptr abstract.Plugin) *Plugin {
 	Plugins[name] = plugin
 	plugin.status.Code = 200
 	plugin.status.Text = "install success"
-	//plugin.status = CheckParameter(bpf, "BPFFilter")
-	//if plugin.status.Code != 200 {
-	//	return plugin
-	//}
-	//plugin.BPFFilter = bpf.String()
-	//plugin.status = CheckParameter(device, "Device")
-	//if plugin.status.Code == 200 {
-	//	plugin.Device = device.String()
-	//}
 	return plugin
 }
