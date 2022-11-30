@@ -25,6 +25,9 @@ type Plugin struct {
 }
 
 func (p *Plugin) setConfig(config any) {
+	if config == nil {
+		return
+	}
 	v := config.(abstract.Config)
 	s := reflect.ValueOf(p.ptr)
 	for key, value := range v {
@@ -38,7 +41,7 @@ func (p *Plugin) setConfig(config any) {
 			}
 			field.Set(reflect.ValueOf(value))
 		}
-		if key == "DEBUG" {
+		if key == "DEBUG" && value == "true" {
 			p.DEBUG = true
 		}
 	}
