@@ -83,7 +83,7 @@ func (s *ByteBuffer) GetInt16() (i int16) {
 }
 
 func (s *ByteBuffer) Check(len int64) {
-	if (s.pos + len) > s.len {
+	if (s.pos + len - 1) > s.len {
 		panic("index of array")
 	}
 }

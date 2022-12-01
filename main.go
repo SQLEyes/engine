@@ -47,7 +47,11 @@ func Run(configFile string) (err error) {
 		//通知用户插件安装完成了
 		switch plugin.ptr.React(abstract.Installed(plugin.status)) {
 		case abstract.Start:
-			go plugin.startCap()
+			if plugin.Enable {
+				go plugin.startCap()
+			} else {
+				log.Infof("%s is disabled", plugin.Name)
+			}
 		default:
 			log.Warnf("%s installed but not in use", plugin.Name)
 		}

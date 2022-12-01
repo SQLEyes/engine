@@ -22,6 +22,7 @@ type Plugin struct {
 	BPFFilter string
 	Device    string
 	DEBUG     bool
+	Enable    bool
 }
 
 func (p *Plugin) setConfig(config any) {
@@ -43,6 +44,9 @@ func (p *Plugin) setConfig(config any) {
 		}
 		if key == "DEBUG" && value == "true" {
 			p.DEBUG = true
+		}
+		if key == "Enable" && value == "true" {
+			p.Enable = true
 		}
 	}
 }
@@ -77,7 +81,7 @@ func (p *Plugin) startCap() {
 			if packet == nil || packet.NetworkLayer() == nil ||
 				packet.TransportLayer() == nil ||
 				packet.TransportLayer().LayerType() != layers.LayerTypeTCP {
-				fmt.Println("ERR : Unknown Packet -_-")
+				p.Errorf("ERR : Unknown Packet -_-")
 				return
 			}
 			p.Broken(packet)
@@ -90,9 +94,10 @@ func InstallPlugin(ptr abstract.Plugin) *Plugin {
 	t := reflect.TypeOf(ptr).Elem()
 	name := strings.TrimSuffix(t.Name(), "Config")
 	plugin := &Plugin{
-		Name:  name,
-		ptr:   ptr,
-		DEBUG: false,
+		Name:   name,
+		ptr:    ptr,
+		DEBUG:  false,
+		Enable: false,
 	}
 	//读取版本信息
 	_, pluginFilePath, _, _ := runtime.Caller(1)
