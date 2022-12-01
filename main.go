@@ -56,7 +56,7 @@ func Run(configFile string) (err error) {
 			log.Warnf("%s installed but not in use", plugin.Name)
 		}
 	}
-	<-c
-	log.Infof("Bye!")
+	s := <-c
+	log.Infof("%s->Bye!", s)
 	return
 }
