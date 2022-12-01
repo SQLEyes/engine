@@ -57,6 +57,8 @@ func Run(configFile string) (err error) {
 		}
 	}
 	s := <-c
-	log.Infof("%s->Bye!", s)
+	if s.String() == "interrupt" {
+		log.Infof("Bye!")
+	}
 	return
 }
