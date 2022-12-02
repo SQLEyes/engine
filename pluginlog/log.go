@@ -1,8 +1,10 @@
 package pluginlog
 
 import (
+	"fmt"
 	"github.com/husanpao/logrus-easy-formatter"
 	"github.com/husanpao/timewriter"
+	"github.com/logrusorgru/aurora"
 	"github.com/sirupsen/logrus"
 )
 
@@ -10,6 +12,31 @@ type PluginLog struct {
 	*logrus.Logger
 }
 
+func (plug *PluginLog) Black(format string, args ...interface{}) {
+	plug.Info(aurora.Black(fmt.Sprintf(format, args...)))
+}
+func (plug *PluginLog) Red(format string, args ...interface{}) {
+	plug.Info(aurora.Red(fmt.Sprintf(format, args...)))
+}
+func (plug *PluginLog) Green(format string, args ...interface{}) {
+	plug.Info(aurora.Green(fmt.Sprintf(format, args...)))
+}
+func (plug *PluginLog) Yellow(format string, args ...interface{}) {
+	plug.Info(aurora.Yellow(fmt.Sprintf(format, args...)))
+}
+
+func (plug *PluginLog) Blue(format string, args ...interface{}) {
+	plug.Info(aurora.Blue(fmt.Sprintf(format, args...)))
+}
+func (plug *PluginLog) Magenta(format string, args ...interface{}) {
+	plug.Info(aurora.Magenta(fmt.Sprintf(format, args...)))
+}
+func (plug *PluginLog) Cyan(format string, args ...interface{}) {
+	plug.Info(aurora.Cyan(fmt.Sprintf(format, args...)))
+}
+func (plug *PluginLog) White(format string, args ...interface{}) {
+	plug.Info(aurora.White(fmt.Sprintf(format, args...)))
+}
 func NewPluginLog(args ...string) *PluginLog {
 	p := &PluginLog{}
 	name := "engine"

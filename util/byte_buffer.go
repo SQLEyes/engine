@@ -1,15 +1,14 @@
 package util
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 )
 
 type ByteBuffer struct {
-	len       int64
-	pos       int64
+	len       int
+	pos       int
 	data      []byte
 	bigending bool
 }
@@ -19,10 +18,10 @@ func NewByteBuffer(data []byte, ending ...bool) *ByteBuffer {
 	if len(ending) > 0 {
 		flag = ending[0]
 	}
-	return &ByteBuffer{data: data, pos: 0, len: int64(len(data)), bigending: flag}
+	return &ByteBuffer{data: data, pos: 0, len: len(data), bigending: flag}
 }
 func (s *ByteBuffer) HasNext() bool {
-	return s.pos < s.len-1
+	return s.pos < s.len
 }
 func (s *ByteBuffer) Print() {
 	fmt.Println(hex.EncodeToString(s.data))
@@ -48,25 +47,25 @@ func (s *ByteBuffer) ReadInt16() []byte {
 }
 func (s *ByteBuffer) ReadEnd() []byte {
 	bs := s.data[s.pos:]
-	s.pos = s.len - 1
+	s.pos = s.len
 	return bs
 }
-func (s *ByteBuffer) Read(len int64) []byte {
+func (s *ByteBuffer) Read(len int) []byte {
 	s.Check(len)
 	bs := s.data[s.pos : s.pos+len]
 	s.pos += len
 	return bs
 }
-func (s *ByteBuffer) GetString(len int64) string {
-	return string(bytes.TrimRight(s.Read(len), "\x00"))
+func (s *ByteBuffer) GetString(len int) string {
+	return fmt.Sprintf("%s", s.Read(len))
 }
-func (s *ByteBuffer) GetInt32() (i int32) {
+func (s *ByteBuffer) GetInt() (i int) {
 	if s.bigending {
 		ui := binary.BigEndian.Uint32(s.ReadInt32())
-		i = int32(ui)
+		i = int(ui)
 	} else {
 		ui := binary.LittleEndian.Uint32(s.ReadInt32())
-		i = int32(ui)
+		i = int(ui)
 	}
 	return
 }
@@ -82,17 +81,17 @@ func (s *ByteBuffer) GetInt16() (i int16) {
 	return
 }
 
-func (s *ByteBuffer) Check(len int64) {
-	if (s.pos + len - 1) > s.len {
-		panic("index of array")
+func (s *ByteBuffer) Check(len int) {
+	if (s.pos + len) > s.len {
+		panic(fmt.Sprintf("ArrayIndexOutOfBoundsException： %d + %d = %d > %d ", s.pos, len, s.pos+len, s.len))
 	}
 }
-func (s *ByteBuffer) Position(pos ...int64) int64 {
+func (s *ByteBuffer) Position(pos ...int) int {
 	if len(pos) > 0 {
 		s.pos = s.pos + pos[0]
 	}
 	return s.pos
 }
-func (s *ByteBuffer) Len() int64 {
+func (s *ByteBuffer) Len() int {
 	return s.len
 }

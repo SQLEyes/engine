@@ -23,6 +23,9 @@ func (p *Plugin) Broken(packet gopacket.Packet) {
 	if !tcp.SYN && !tcp.FIN && !tcp.RST && len(tcp.LayerPayload()) == 0 {
 		return
 	}
+	if len(tcp.Payload) == 0 {
+		return
+	}
 	broken.Payload = tcp.Payload
 	p.ptr.React(broken)
 }
